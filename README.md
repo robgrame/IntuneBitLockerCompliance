@@ -145,18 +145,26 @@ separata. La policy poi lo *referenzia* (non lo carica direttamente).
 
 | Campo | Tipo | Note |
 |------|------|------|
-| MountPoint | String | sempre disco di sistema |
-| ProtectionStatus | String | On / Off / Unknown |
-| VolumeStatus | String | FullyEncrypted, EncryptionInProgress, ... |
-| EncryptionMethod | String | XtsAes256, XtsAes128, Aes256, ... |
-| EncryptionPercentage | Int64 | 0-100 |
-| KeyProtectorTypes | String | csv (es. "Tpm,RecoveryPassword") |
-| HasTpmProtector | Boolean | |
-| HasRecoveryPasswordProtector | Boolean | |
-| RecoveryKeyEscrowedInEntraId | Boolean | dsregcmd + EventID 845 |
-| EntraIdJoined | Boolean | |
-| TpmReady | Boolean | |
-| NonComplianceReasons | String | concatenati con " \| " |
+| BL_MountPoint | String | sempre disco di sistema |
+| BL_ProtectionStatus | String | On / Off / Unknown |
+| BL_VolumeStatus | String | FullyEncrypted, EncryptionInProgress, ... |
+| BL_EncryptionMethod | String | XtsAes256, XtsAes128, Aes256, ... |
+| BL_EncryptionPercentage | Int64 | 0-100 |
+| BL_KeyProtectorTypes | String | csv (es. "Tpm,RecoveryPassword") |
+| BL_HasTpmProtector | Boolean | |
+| BL_HasRecoveryPasswordProtector | Boolean | |
+| BL_RecoveryKeyEscrowedInEntraId | Boolean | dsregcmd + EventID 845 |
+| BL_EntraIdJoined | Boolean | |
+| BL_TpmReady | Boolean | |
+| BL_NonComplianceReasons | String | concatenati con " \| " |
+
+> **Nota sui prefissi `BL_`** — Tutti i nomi dei setting custom hanno
+> prefisso `BL_` per essere immediatamente riconoscibili tra le decine di
+> setting valutati nella vista *Reports → Endpoint security → Device
+> compliance → Per-setting status* del portale Intune e nel drill-down
+> per-device. Se modifichi i nomi nel JSON delle regole, ricordati di
+> aggiornarli anche nello script di discovery (devono corrispondere
+> esattamente).
 
 ## Mappa cause di non-compliance → azione
 

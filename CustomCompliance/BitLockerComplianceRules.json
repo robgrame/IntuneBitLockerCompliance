@@ -1,7 +1,7 @@
 {
   "Rules": [
     {
-      "SettingName": "ProtectionStatus",
+      "SettingName": "BL_ProtectionStatus",
       "Operator": "IsEquals",
       "DataType": "String",
       "Operand": "On",
@@ -14,7 +14,7 @@
       ]
     },
     {
-      "SettingName": "VolumeStatus",
+      "SettingName": "BL_VolumeStatus",
       "Operator": "IsEquals",
       "DataType": "String",
       "Operand": "FullyEncrypted",
@@ -27,7 +27,7 @@
       ]
     },
     {
-      "SettingName": "EncryptionPercentage",
+      "SettingName": "BL_EncryptionPercentage",
       "Operator": "GreaterEquals",
       "DataType": "Int64",
       "Operand": 100,
@@ -40,7 +40,7 @@
       ]
     },
     {
-      "SettingName": "EncryptionMethod",
+      "SettingName": "BL_EncryptionMethod",
       "Operator": "IsEquals",
       "DataType": "String",
       "Operand": "XtsAes256",
@@ -53,7 +53,7 @@
       ]
     },
     {
-      "SettingName": "HasTpmProtector",
+      "SettingName": "BL_HasTpmProtector",
       "Operator": "IsEquals",
       "DataType": "Boolean",
       "Operand": true,
@@ -66,7 +66,7 @@
       ]
     },
     {
-      "SettingName": "HasRecoveryPasswordProtector",
+      "SettingName": "BL_HasRecoveryPasswordProtector",
       "Operator": "IsEquals",
       "DataType": "Boolean",
       "Operand": true,
@@ -79,7 +79,7 @@
       ]
     },
     {
-      "SettingName": "RecoveryKeyEscrowedInEntraId",
+      "SettingName": "BL_RecoveryKeyEscrowedInEntraId",
       "Operator": "IsEquals",
       "DataType": "Boolean",
       "Operand": true,

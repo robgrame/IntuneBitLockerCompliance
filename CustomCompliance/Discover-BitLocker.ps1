@@ -14,19 +14,19 @@
     - The script MUST emit one and only one JSON object to stdout.
       Any extra Write-Host / Write-Output will break parsing.
 
-    Output schema (flat):
-        MountPoint                   : string  ("C:")
-        ProtectionStatus             : string  ("On" | "Off" | ...)
-        VolumeStatus                 : string  ("FullyEncrypted" | ...)
-        EncryptionMethod             : string
-        EncryptionPercentage         : integer (0-100)
-        KeyProtectorTypes            : string  (comma-separated list)
-        HasTpmProtector              : boolean
-        HasRecoveryPasswordProtector : boolean
-        RecoveryKeyEscrowedInEntraId : boolean
-        EntraIdJoined                : boolean
-        TpmReady                     : boolean
-        NonComplianceReasons         : string  (' | ' separated, or empty)
+    Output schema (flat, all keys prefixed BL_ to identify them in Intune Settings reports):
+        BL_MountPoint                   : string  ("C:")
+        BL_ProtectionStatus             : string  ("On" | "Off" | ...)
+        BL_VolumeStatus                 : string  ("FullyEncrypted" | ...)
+        BL_EncryptionMethod             : string
+        BL_EncryptionPercentage         : integer (0-100)
+        BL_KeyProtectorTypes            : string  (comma-separated list)
+        BL_HasTpmProtector              : boolean
+        BL_HasRecoveryPasswordProtector : boolean
+        BL_RecoveryKeyEscrowedInEntraId : boolean
+        BL_EntraIdJoined                : boolean
+        BL_TpmReady                     : boolean
+        BL_NonComplianceReasons         : string  (' | ' separated, or empty)
 #>
 
 #region Helpers
@@ -108,18 +108,18 @@ try {
     }
 
     $result = [ordered]@{
-        MountPoint                   = "$systemDrive"
-        ProtectionStatus             = "$($vol.ProtectionStatus)"
-        VolumeStatus                 = "$($vol.VolumeStatus)"
-        EncryptionMethod             = "$($vol.EncryptionMethod)"
-        EncryptionPercentage         = [int64]$vol.EncryptionPercentage
-        KeyProtectorTypes            = ($protectorTypes -join ',')
-        HasTpmProtector              = [bool]($protectorTypes -contains 'Tpm')
-        HasRecoveryPasswordProtector = [bool]($protectorTypes -contains 'RecoveryPassword')
-        RecoveryKeyEscrowedInEntraId = [bool]$escrowed
-        EntraIdJoined                = [bool]$entraJoined
-        TpmReady                     = [bool]$tpmReady
-        NonComplianceReasons         = ($reasons -join ' | ')
+        BL_MountPoint                   = "$systemDrive"
+        BL_ProtectionStatus             = "$($vol.ProtectionStatus)"
+        BL_VolumeStatus                 = "$($vol.VolumeStatus)"
+        BL_EncryptionMethod             = "$($vol.EncryptionMethod)"
+        BL_EncryptionPercentage         = [int64]$vol.EncryptionPercentage
+        BL_KeyProtectorTypes            = ($protectorTypes -join ',')
+        BL_HasTpmProtector              = [bool]($protectorTypes -contains 'Tpm')
+        BL_HasRecoveryPasswordProtector = [bool]($protectorTypes -contains 'RecoveryPassword')
+        BL_RecoveryKeyEscrowedInEntraId = [bool]$escrowed
+        BL_EntraIdJoined                = [bool]$entraJoined
+        BL_TpmReady                     = [bool]$tpmReady
+        BL_NonComplianceReasons         = ($reasons -join ' | ')
     }
 
     # Emit exactly one line; Write-Host bypasses the success stream and
@@ -129,18 +129,18 @@ try {
 }
 catch {
     Write-Output (@{
-        MountPoint                   = "$env:SystemDrive"
-        ProtectionStatus             = "Error"
-        VolumeStatus                 = "Error"
-        EncryptionMethod             = "Unknown"
-        EncryptionPercentage         = [int64]0
-        KeyProtectorTypes            = ""
-        HasTpmProtector              = $false
-        HasRecoveryPasswordProtector = $false
-        RecoveryKeyEscrowedInEntraId = $false
-        EntraIdJoined                = $false
-        TpmReady                     = $false
-        NonComplianceReasons         = "Discovery error: $($_.Exception.Message)"
+        BL_MountPoint                   = "$env:SystemDrive"
+        BL_ProtectionStatus             = "Error"
+        BL_VolumeStatus                 = "Error"
+        BL_EncryptionMethod             = "Unknown"
+        BL_EncryptionPercentage         = [int64]0
+        BL_KeyProtectorTypes            = ""
+        BL_HasTpmProtector              = $false
+        BL_HasRecoveryPasswordProtector = $false
+        BL_RecoveryKeyEscrowedInEntraId = $false
+        BL_EntraIdJoined                = $false
+        BL_TpmReady                     = $false
+        BL_NonComplianceReasons         = "Discovery error: $($_.Exception.Message)"
     } | ConvertTo-Json -Compress)
     exit 0
 }
