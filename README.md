@@ -91,13 +91,30 @@ Configuration Profile → Certificates).
 
 ### Deployment (Custom Compliance)
 
-1. Intune admin center → **Endpoint security → Device compliance → Scripts → Add → Windows 10/11**.
-2. Caricare `Discover-BitLocker.ps1` (firmato).
-3. **Compliance policies → Create policy → Windows 10/11 → Custom Compliance**.
-4. Selezionare lo script appena creato e caricare `BitLockerComplianceRules.json`.
-5. Assegnare al gruppo.
-6. Sul device l'utente vedrà il titolo/descrizione localizzato per ogni regola
-   fallita dentro **Company Portal → Devices → \<device\> → Check status**.
+Lo script di discovery va caricato **prima** della policy, in una sezione
+separata. La policy poi lo *referenzia* (non lo carica direttamente).
+
+1. **Caricare lo script** (prerequisito).
+   Intune admin center → **Devices → Compliance** → tab **Scripts** in alto →
+   **+ Add → Windows 10 and later**.
+   - Detection script: contenuto di `Discover-BitLocker.ps1` (firmato)
+   - `Run this script using the logged on credentials` = **No**
+   - `Enforce script signature check` = **Yes**
+   - `Run script in 64-bit PowerShell host` = **Yes**
+
+2. **Creare la Compliance Policy** che usa lo script.
+   **Devices → Compliance → Policies → + Create policy** → Platform
+   **Windows 10 and later** → in *Compliance settings* aprire la sezione
+   **Custom Compliance**:
+   - **Select your discovery script** → scegli lo script caricato al passo 1
+   - **Upload and validate the JSON file** → carica `BitLockerComplianceRules.json`
+3. Configurare *Actions for noncompliance* e *Assignments*, poi **Create**.
+4. Sul device l'utente vedrà il titolo/descrizione localizzato per ogni regola
+   fallita in **Company Portal → Devices → \<device\> → Check status**.
+
+> ⚠️ La tab giusta è **Devices → Compliance → Scripts**, *non*
+> **Devices → Scripts and remediations** (quella è per Proactive Remediations
+> ed è dove va il Detect/Remediate del Livello A).
 
 ## Schema diagnostico (Custom Compliance, campi flat)
 
