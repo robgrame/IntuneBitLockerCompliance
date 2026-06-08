@@ -1,0 +1,15 @@
+# PowerShell / Windows artifacts
+*.log
+*.tmp
+*.bak
+
+# Signed-script intermediates
+*.cat
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+desktop.ini
