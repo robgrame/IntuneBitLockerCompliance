@@ -9,13 +9,38 @@ cifratura, recovery key non escrowed in Entra ID, ecc.).
 La soluzione è organizzata in **due livelli complementari**:
 
 ```
+Inventory/
+  Detect-BitLockerState.ps1          # Inventario stato (detection-only, exit 0)
 Remediations/
-  Detect-BitLockerCompliance.ps1     # Intune Remediations - detection
+  Detect-BitLockerCompliance.ps1     # Intune Remediations - detection (compliance)
   Remediate-BitLockerCompliance.ps1  # Intune Remediations - safe remediations
 CustomCompliance/
   Discover-BitLocker.ps1             # Discovery script (DEVE essere firmato)
   BitLockerComplianceRules.json      # Regole + messaggi IT/EN per Company Portal
+Reporting/
+  Get-BitLockerComplianceReport.ps1  # Aggregazione Graph dei detection compliance
+  Get-BitLockerInventoryReport.ps1   # Aggregazione Graph dei detection inventory
 ```
+
+## Livello A0 — Inventario puro (detection-only)
+
+Per il caso d'uso "voglio solo sapere lo stato attuale di tutta la flotta"
+senza definire una soglia di compliance, usare
+`Inventory\Detect-BitLockerState.ps1`. Caratteristiche:
+
+- enumera **tutti i fixed volume** (non solo quello di sistema)
+- per ogni volume: `ProtectionStatus`, `VolumeStatus`, `EncryptionMethod`,
+  `EncryptionPercentage`, `KeyProtectors` (tipo + flag `AutoUnlockEnabled`),
+  `LockStatus`, `CapacityGB`, presenza TPM/RecoveryPassword/Pin/StartupKey
+- dettaglio TPM (Manufacturer, Version, Ready, Owned)
+- output `BITLOCKER_STATE={json}`
+- **exit 0 sempre** → il device finisce sotto "Without issues" e l'output è
+  in `detectionScriptOutput` (lettura via Graph)
+
+Deployment in Intune: caricalo come Remediation lasciando il campo
+*Remediation script* **vuoto**. Lo script di reporting
+`Reporting\Get-BitLockerInventoryReport.ps1` produce CSV/HTML con una
+riga per volume e sommario per metodo di cifratura.
 
 ## Livello A — Intune Remediations (visibilità immediata)
 
