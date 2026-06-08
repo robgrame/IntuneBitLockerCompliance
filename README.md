@@ -144,6 +144,31 @@ separata. La policy poi lo *referenzia* (non lo carica direttamente).
 | `EncryptionMethod` sotto requisito | Pianificare decrypt + re-encrypt (non automatico) |
 | `VolumeStatus` non FullyEncrypted | Verificare assegnazione policy di cifratura (Endpoint security → Disk encryption) |
 
+## Reporting aggregato
+
+Lo script `Reporting\Get-BitLockerComplianceReport.ps1` interroga Microsoft
+Graph (`deviceManagement/deviceHealthScripts/{id}/deviceRunStates`),
+estrae la riga `BITLOCKER_DIAG={json}` dal `preRemediationDetectionScriptOutput`
+di ciascun device e produce CSV + (opzionale) HTML con una riga per device
+e tutti i campi diagnostici + sommario delle cause più frequenti.
+
+```powershell
+Install-Module Microsoft.Graph -Scope CurrentUser
+Connect-MgGraph -Scopes DeviceManagementManagedDevices.Read.All,DeviceManagementConfiguration.Read.All
+.\Reporting\Get-BitLockerComplianceReport.ps1 `
+    -ScriptId '<GUID-del-detection-script>' `
+    -OutputCsv .\bitlocker.csv `
+    -OutputHtml .\bitlocker.html
+```
+
+Lo `ScriptId` si trova nell'URL del Remediation in Intune
+(`.../endpointSecurityRemediationOverview/scriptId/<GUID>`) oppure via
+`Get-MgBetaDeviceManagementDeviceHealthScript` filtrando per `displayName`.
+
+Per consumi ricorrenti, alternative al posto dello script: export del report
+"Remediations" dal portale Intune (CSV), oppure invio dei dati a Log
+Analytics tramite *Tenant administration → Connectors → Data export*.
+
 ## Privacy
 
 Il diagnostico NON include la recovery password in chiaro: vengono esposti
