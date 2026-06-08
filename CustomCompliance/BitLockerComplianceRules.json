@@ -1,10 +1,10 @@
 {
   "Rules": [
     {
-      "SettingName": "BL_ProtectionStatus",
+      "SettingName": "BL_IsProtectionOn",
       "Operator": "IsEquals",
-      "DataType": "String",
-      "Operand": "On",
+      "DataType": "Boolean",
+      "Operand": true,
       "MoreInfoUrl": "https://learn.microsoft.com/windows/security/operating-system-security/data-protection/bitlocker/",
       "RemediationStrings": [
         { "Language": "en_US", "Title": "BitLocker protection is not active",
@@ -14,10 +14,10 @@
       ]
     },
     {
-      "SettingName": "BL_VolumeStatus",
+      "SettingName": "BL_IsVolumeFullyEncrypted",
       "Operator": "IsEquals",
-      "DataType": "String",
-      "Operand": "FullyEncrypted",
+      "DataType": "Boolean",
+      "Operand": true,
       "MoreInfoUrl": "https://learn.microsoft.com/windows/security/operating-system-security/data-protection/bitlocker/",
       "RemediationStrings": [
         { "Language": "en_US", "Title": "System drive is not fully encrypted",
@@ -27,10 +27,10 @@
       ]
     },
     {
-      "SettingName": "BL_EncryptionPercentage",
-      "Operator": "GreaterEquals",
-      "DataType": "Int64",
-      "Operand": 100,
+      "SettingName": "BL_IsEncryptionComplete",
+      "Operator": "IsEquals",
+      "DataType": "Boolean",
+      "Operand": true,
       "MoreInfoUrl": "https://learn.microsoft.com/windows/security/operating-system-security/data-protection/bitlocker/",
       "RemediationStrings": [
         { "Language": "en_US", "Title": "Encryption is not complete",
@@ -40,15 +40,15 @@
       ]
     },
     {
-      "SettingName": "BL_EncryptionMethod",
+      "SettingName": "BL_IsEncryptionMethodXtsAes256",
       "Operator": "IsEquals",
-      "DataType": "String",
-      "Operand": "XtsAes256",
+      "DataType": "Boolean",
+      "Operand": true,
       "MoreInfoUrl": "https://learn.microsoft.com/windows/security/operating-system-security/data-protection/bitlocker/",
       "RemediationStrings": [
-        { "Language": "en_US", "Title": "Encryption algorithm below requirement",
+        { "Language": "en_US", "Title": "Encryption algorithm is not XtsAes256",
           "Description": "BitLocker must use XtsAes256 on the system drive. Changing algorithm requires decrypting and re-encrypting the drive; contact IT." },
-        { "Language": "it_IT", "Title": "Algoritmo di cifratura non conforme",
+        { "Language": "it_IT", "Title": "Algoritmo di cifratura non è XtsAes256",
           "Description": "BitLocker deve usare XtsAes256 sul disco di sistema. Cambiare algoritmo richiede di decifrare e ri-cifrare il disco; contattare IT." }
       ]
     },
@@ -79,7 +79,7 @@
       ]
     },
     {
-      "SettingName": "BL_RecoveryKeyEscrowedInEntraId",
+      "SettingName": "BL_IsRecoveryKeyEscrowedInEntraId",
       "Operator": "IsEquals",
       "DataType": "Boolean",
       "Operand": true,

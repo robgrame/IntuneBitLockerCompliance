@@ -143,6 +143,29 @@ separata. La policy poi lo *referenzia* (non lo carica direttamente).
 
 ## Schema diagnostico (Custom Compliance, campi flat)
 
+### Setting valutati (booleani self-documenting, true = compliant)
+
+Il nome del setting incorpora il valore atteso così che la vista
+*Reports → Endpoint security → Device compliance → Per-setting status*
+e il drill-down per-device del portale siano leggibili senza dover
+aprire le regole. Ogni regola è un semplice `Boolean IsEquals true`.
+
+| SettingName | Significato (true = compliant) |
+|-------------|--------------------------------|
+| BL_IsProtectionOn | `ProtectionStatus == 'On'` |
+| BL_IsVolumeFullyEncrypted | `VolumeStatus == 'FullyEncrypted'` |
+| BL_IsEncryptionComplete | `EncryptionPercentage >= 100` |
+| BL_IsEncryptionMethodXtsAes256 | `EncryptionMethod == 'XtsAes256'` |
+| BL_HasTpmProtector | TPM key protector presente |
+| BL_HasRecoveryPasswordProtector | RecoveryPassword key protector presente |
+| BL_IsRecoveryKeyEscrowedInEntraId | Recovery key salvata in Entra ID (EventID 845) |
+
+### Campi raw diagnostici (NON valutati dalle regole)
+
+Sempre emessi dal discovery script per debug e per essere consumati dai
+report `Get-BitLockerInventoryReport.ps1`. Non sono referenziati dal
+JSON, quindi non appaiono nel report per-setting di Intune.
+
 | Campo | Tipo | Note |
 |------|------|------|
 | BL_MountPoint | String | sempre disco di sistema |
@@ -151,20 +174,15 @@ separata. La policy poi lo *referenzia* (non lo carica direttamente).
 | BL_EncryptionMethod | String | XtsAes256, XtsAes128, Aes256, ... |
 | BL_EncryptionPercentage | Int64 | 0-100 |
 | BL_KeyProtectorTypes | String | csv (es. "Tpm,RecoveryPassword") |
-| BL_HasTpmProtector | Boolean | |
-| BL_HasRecoveryPasswordProtector | Boolean | |
-| BL_RecoveryKeyEscrowedInEntraId | Boolean | dsregcmd + EventID 845 |
 | BL_EntraIdJoined | Boolean | |
 | BL_TpmReady | Boolean | |
 | BL_NonComplianceReasons | String | concatenati con " \| " |
 
-> **Nota sui prefissi `BL_`** — Tutti i nomi dei setting custom hanno
-> prefisso `BL_` per essere immediatamente riconoscibili tra le decine di
-> setting valutati nella vista *Reports → Endpoint security → Device
-> compliance → Per-setting status* del portale Intune e nel drill-down
-> per-device. Se modifichi i nomi nel JSON delle regole, ricordati di
-> aggiornarli anche nello script di discovery (devono corrispondere
-> esattamente).
+> **Pattern di naming** — Prefisso `BL_` per identificare il dominio; per i
+> setting valutati il nome include il valore atteso (`Is*XtsAes256`,
+> `Is*Complete`...). Tradeoff: cambiare il valore atteso richiede
+> rinominare il setting (sia nello script discovery sia nel JSON
+> regole).
 
 ## Mappa cause di non-compliance → azione
 

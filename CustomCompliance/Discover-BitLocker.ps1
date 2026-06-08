@@ -14,19 +14,29 @@
     - The script MUST emit one and only one JSON object to stdout.
       Any extra Write-Host / Write-Output will break parsing.
 
-    Output schema (flat, all keys prefixed BL_ to identify them in Intune Settings reports):
-        BL_MountPoint                   : string  ("C:")
-        BL_ProtectionStatus             : string  ("On" | "Off" | ...)
-        BL_VolumeStatus                 : string  ("FullyEncrypted" | ...)
-        BL_EncryptionMethod             : string
-        BL_EncryptionPercentage         : integer (0-100)
-        BL_KeyProtectorTypes            : string  (comma-separated list)
-        BL_HasTpmProtector              : boolean
-        BL_HasRecoveryPasswordProtector : boolean
-        BL_RecoveryKeyEscrowedInEntraId : boolean
-        BL_EntraIdJoined                : boolean
-        BL_TpmReady                     : boolean
-        BL_NonComplianceReasons         : string  (' | ' separated, or empty)
+    Output schema (flat). Keys prefixed BL_*; *evaluated* settings encode the
+    expected value in the name (Is*/Has*) so the Intune per-setting report
+    is self-documenting (e.g. "BL_IsEncryptionMethodXtsAes256 = Compliant"):
+
+        Evaluated booleans (referenced by BitLockerComplianceRules.json):
+            BL_IsProtectionOn                  : Bool (true = ProtectionStatus == 'On')
+            BL_IsVolumeFullyEncrypted          : Bool (true = VolumeStatus  == 'FullyEncrypted')
+            BL_IsEncryptionComplete            : Bool (true = EncryptionPercentage >= 100)
+            BL_IsEncryptionMethodXtsAes256     : Bool (true = EncryptionMethod == 'XtsAes256')
+            BL_HasTpmProtector                 : Bool
+            BL_HasRecoveryPasswordProtector    : Bool
+            BL_IsRecoveryKeyEscrowedInEntraId  : Bool
+
+        Raw diagnostic fields (NOT evaluated; emitted for debugging):
+            BL_MountPoint                      : String  ("C:")
+            BL_ProtectionStatus                : String  ("On" | "Off" | ...)
+            BL_VolumeStatus                    : String
+            BL_EncryptionMethod                : String
+            BL_EncryptionPercentage            : Int64
+            BL_KeyProtectorTypes               : String  (comma-separated)
+            BL_EntraIdJoined                   : Bool
+            BL_TpmReady                        : Bool
+            BL_NonComplianceReasons            : String  (' | ' separated)
 #>
 
 #region Helpers
@@ -108,18 +118,25 @@ try {
     }
 
     $result = [ordered]@{
-        BL_MountPoint                   = "$systemDrive"
-        BL_ProtectionStatus             = "$($vol.ProtectionStatus)"
-        BL_VolumeStatus                 = "$($vol.VolumeStatus)"
-        BL_EncryptionMethod             = "$($vol.EncryptionMethod)"
-        BL_EncryptionPercentage         = [int64]$vol.EncryptionPercentage
-        BL_KeyProtectorTypes            = ($protectorTypes -join ',')
-        BL_HasTpmProtector              = [bool]($protectorTypes -contains 'Tpm')
-        BL_HasRecoveryPasswordProtector = [bool]($protectorTypes -contains 'RecoveryPassword')
-        BL_RecoveryKeyEscrowedInEntraId = [bool]$escrowed
-        BL_EntraIdJoined                = [bool]$entraJoined
-        BL_TpmReady                     = [bool]$tpmReady
-        BL_NonComplianceReasons         = ($reasons -join ' | ')
+        # ---- Self-documenting boolean settings evaluated by Custom Compliance rules ----
+        BL_IsProtectionOn                  = [bool]("$($vol.ProtectionStatus)" -eq 'On')
+        BL_IsVolumeFullyEncrypted          = [bool]("$($vol.VolumeStatus)" -eq 'FullyEncrypted')
+        BL_IsEncryptionComplete            = [bool]([int]$vol.EncryptionPercentage -ge 100)
+        BL_IsEncryptionMethodXtsAes256     = [bool]("$($vol.EncryptionMethod)" -eq 'XtsAes256')
+        BL_HasTpmProtector                 = [bool]($protectorTypes -contains 'Tpm')
+        BL_HasRecoveryPasswordProtector    = [bool]($protectorTypes -contains 'RecoveryPassword')
+        BL_IsRecoveryKeyEscrowedInEntraId  = [bool]$escrowed
+
+        # ---- Raw diagnostic fields (NOT evaluated by rules; carried for debugging) ----
+        BL_MountPoint                      = "$systemDrive"
+        BL_ProtectionStatus                = "$($vol.ProtectionStatus)"
+        BL_VolumeStatus                    = "$($vol.VolumeStatus)"
+        BL_EncryptionMethod                = "$($vol.EncryptionMethod)"
+        BL_EncryptionPercentage            = [int64]$vol.EncryptionPercentage
+        BL_KeyProtectorTypes               = ($protectorTypes -join ',')
+        BL_EntraIdJoined                   = [bool]$entraJoined
+        BL_TpmReady                        = [bool]$tpmReady
+        BL_NonComplianceReasons            = ($reasons -join ' | ')
     }
 
     # Emit exactly one line; Write-Host bypasses the success stream and
@@ -129,18 +146,22 @@ try {
 }
 catch {
     Write-Output (@{
-        BL_MountPoint                   = "$env:SystemDrive"
-        BL_ProtectionStatus             = "Error"
-        BL_VolumeStatus                 = "Error"
-        BL_EncryptionMethod             = "Unknown"
-        BL_EncryptionPercentage         = [int64]0
-        BL_KeyProtectorTypes            = ""
-        BL_HasTpmProtector              = $false
-        BL_HasRecoveryPasswordProtector = $false
-        BL_RecoveryKeyEscrowedInEntraId = $false
-        BL_EntraIdJoined                = $false
-        BL_TpmReady                     = $false
-        BL_NonComplianceReasons         = "Discovery error: $($_.Exception.Message)"
+        BL_IsProtectionOn                  = $false
+        BL_IsVolumeFullyEncrypted          = $false
+        BL_IsEncryptionComplete            = $false
+        BL_IsEncryptionMethodXtsAes256     = $false
+        BL_HasTpmProtector                 = $false
+        BL_HasRecoveryPasswordProtector    = $false
+        BL_IsRecoveryKeyEscrowedInEntraId  = $false
+        BL_MountPoint                      = "$env:SystemDrive"
+        BL_ProtectionStatus                = "Error"
+        BL_VolumeStatus                    = "Error"
+        BL_EncryptionMethod                = "Unknown"
+        BL_EncryptionPercentage            = [int64]0
+        BL_KeyProtectorTypes               = ""
+        BL_EntraIdJoined                   = $false
+        BL_TpmReady                        = $false
+        BL_NonComplianceReasons            = "Discovery error: $($_.Exception.Message)"
     } | ConvertTo-Json -Compress)
     exit 0
 }
