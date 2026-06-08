@@ -43,10 +43,12 @@ function Test-RecoveryPasswordEscrowed {
     if (-not (Test-IsEntraIdJoined)) { return $false }
     if (-not $RecoveryKeyIds -or $RecoveryKeyIds.Count -eq 0) { return $false }
     try {
+        # 2>$null + SilentlyContinue: suppress noise on devices where the log has no entries
         $events = Get-WinEvent -FilterHashtable @{
             LogName = 'Microsoft-Windows-BitLocker/BitLocker Management'
             Id      = 845
-        } -ErrorAction Stop
+        } -ErrorAction SilentlyContinue 2>$null
+        if (-not $events) { return $false }
     } catch { return $false }
 
     foreach ($kid in $RecoveryKeyIds) {
@@ -62,6 +64,14 @@ function Test-RecoveryPasswordEscrowed {
     return $true
 }
 #endregion
+
+# Silence all non-terminating stream noise so stdout contains ONLY the final JSON line.
+# Intune Custom Compliance requires the discovery script to emit exactly ONE JSON object.
+$ErrorActionPreference   = 'SilentlyContinue'
+$WarningPreference       = 'SilentlyContinue'
+$VerbosePreference       = 'SilentlyContinue'
+$InformationPreference   = 'SilentlyContinue'
+$ProgressPreference      = 'SilentlyContinue'
 
 try {
     $systemDrive = $env:SystemDrive
@@ -102,7 +112,7 @@ try {
         ProtectionStatus             = "$($vol.ProtectionStatus)"
         VolumeStatus                 = "$($vol.VolumeStatus)"
         EncryptionMethod             = "$($vol.EncryptionMethod)"
-        EncryptionPercentage         = [int]$vol.EncryptionPercentage
+        EncryptionPercentage         = [int64]$vol.EncryptionPercentage
         KeyProtectorTypes            = ($protectorTypes -join ',')
         HasTpmProtector              = [bool]($protectorTypes -contains 'Tpm')
         HasRecoveryPasswordProtector = [bool]($protectorTypes -contains 'RecoveryPassword')
@@ -112,16 +122,18 @@ try {
         NonComplianceReasons         = ($reasons -join ' | ')
     }
 
-    return ($result | ConvertTo-Json -Compress)
+    # Emit exactly one line; Write-Host bypasses the success stream and
+    # ConvertTo-Json -Compress guarantees a single line of JSON.
+    Write-Output ($result | ConvertTo-Json -Compress)
+    exit 0
 }
 catch {
-    # On error emit a JSON with the error so the rule engine can flag it
-    return (@{
+    Write-Output (@{
         MountPoint                   = "$env:SystemDrive"
         ProtectionStatus             = "Error"
         VolumeStatus                 = "Error"
         EncryptionMethod             = "Unknown"
-        EncryptionPercentage         = 0
+        EncryptionPercentage         = [int64]0
         KeyProtectorTypes            = ""
         HasTpmProtector              = $false
         HasRecoveryPasswordProtector = $false
@@ -130,4 +142,5 @@ catch {
         TpmReady                     = $false
         NonComplianceReasons         = "Discovery error: $($_.Exception.Message)"
     } | ConvertTo-Json -Compress)
+    exit 0
 }
