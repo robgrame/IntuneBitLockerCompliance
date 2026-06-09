@@ -1,0 +1,95 @@
+{
+  "Rules": [
+    {
+      "SettingName": "BL_IsProtectionOn",
+      "Operator": "IsEquals",
+      "DataType": "Boolean",
+      "Operand": true,
+      "MoreInfoUrl": "https://learn.microsoft.com/windows/security/operating-system-security/data-protection/bitlocker/",
+      "RemediationStrings": [
+        { "Language": "en_US", "Title": "BitLocker protection is not active",
+          "Description": "BitLocker protection must be On for the system drive. Resume protection from Control Panel > BitLocker Drive Encryption, or contact IT." },
+        { "Language": "it_IT", "Title": "Protezione BitLocker non attiva",
+          "Description": "La protezione BitLocker deve essere attiva sul disco di sistema. Riprendere la protezione da Pannello di Controllo > Crittografia unità BitLocker, oppure contattare IT." }
+      ]
+    },
+    {
+      "SettingName": "BL_IsVolumeFullyEncrypted",
+      "Operator": "IsEquals",
+      "DataType": "Boolean",
+      "Operand": true,
+      "MoreInfoUrl": "https://learn.microsoft.com/windows/security/operating-system-security/data-protection/bitlocker/",
+      "RemediationStrings": [
+        { "Language": "en_US", "Title": "System drive is not fully encrypted",
+          "Description": "The system volume must be FullyEncrypted. If encryption is in progress, leave the device plugged in and wait for it to finish." },
+        { "Language": "it_IT", "Title": "Disco di sistema non completamente cifrato",
+          "Description": "Il volume di sistema deve risultare FullyEncrypted. Se la cifratura è in corso, lasciare il dispositivo collegato all'alimentazione fino al termine." }
+      ]
+    },
+    {
+      "SettingName": "BL_IsEncryptionComplete",
+      "Operator": "IsEquals",
+      "DataType": "Boolean",
+      "Operand": true,
+      "MoreInfoUrl": "https://learn.microsoft.com/windows/security/operating-system-security/data-protection/bitlocker/",
+      "RemediationStrings": [
+        { "Language": "en_US", "Title": "Encryption is not complete",
+          "Description": "Encryption must reach 100%. Keep the device powered on until BitLocker finishes encrypting." },
+        { "Language": "it_IT", "Title": "Cifratura non completata",
+          "Description": "La cifratura deve raggiungere il 100%. Mantenere il dispositivo acceso finché BitLocker non ha completato." }
+      ]
+    },
+    {
+      "SettingName": "BL_IsEncryptionMethodAes128",
+      "Operator": "IsEquals",
+      "DataType": "Boolean",
+      "Operand": true,
+      "MoreInfoUrl": "https://learn.microsoft.com/windows/security/operating-system-security/data-protection/bitlocker/",
+      "RemediationStrings": [
+        { "Language": "en_US", "Title": "Encryption algorithm is not AES-128",
+          "Description": "BitLocker must use AES-128 (Aes128 CBC or XtsAes128) on the system drive. Changing algorithm requires decrypting and re-encrypting the drive; contact IT." },
+        { "Language": "it_IT", "Title": "Algoritmo di cifratura non è AES-128",
+          "Description": "BitLocker deve usare AES-128 (Aes128 CBC o XtsAes128) sul disco di sistema. Cambiare algoritmo richiede di decifrare e ri-cifrare il disco; contattare IT." }
+      ]
+    },
+    {
+      "SettingName": "BL_HasTpmProtector",
+      "Operator": "IsEquals",
+      "DataType": "Boolean",
+      "Operand": true,
+      "MoreInfoUrl": "https://learn.microsoft.com/windows/security/operating-system-security/data-protection/bitlocker/",
+      "RemediationStrings": [
+        { "Language": "en_US", "Title": "Missing TPM key protector",
+          "Description": "The system drive must be protected by a TPM key protector. Verify TPM is enabled in firmware and contact IT to re-provision BitLocker." },
+        { "Language": "it_IT", "Title": "Protettore TPM mancante",
+          "Description": "Il disco di sistema deve essere protetto da un protettore TPM. Verificare che il TPM sia abilitato nel firmware e contattare IT per ri-provisionare BitLocker." }
+      ]
+    },
+    {
+      "SettingName": "BL_HasRecoveryPasswordProtector",
+      "Operator": "IsEquals",
+      "DataType": "Boolean",
+      "Operand": true,
+      "MoreInfoUrl": "https://learn.microsoft.com/windows/security/operating-system-security/data-protection/bitlocker/",
+      "RemediationStrings": [
+        { "Language": "en_US", "Title": "Missing recovery key",
+          "Description": "A BitLocker RecoveryPassword key protector is required. Contact IT to add one." },
+        { "Language": "it_IT", "Title": "Chiave di ripristino mancante",
+          "Description": "È richiesto un protettore RecoveryPassword di BitLocker. Contattare IT per aggiungerlo." }
+      ]
+    },
+    {
+      "SettingName": "BL_IsRecoveryKeyEscrowedInEntraId",
+      "Operator": "IsEquals",
+      "DataType": "Boolean",
+      "Operand": true,
+      "MoreInfoUrl": "https://learn.microsoft.com/mem/intune/protect/encrypt-devices",
+      "RemediationStrings": [
+        { "Language": "en_US", "Title": "Recovery key not backed up to Entra ID",
+          "Description": "The BitLocker recovery key must be escrowed to Entra ID (Azure AD). The next compliance run will retry automatically; if it persists, sign in to a corporate network and run a sync from Company Portal." },
+        { "Language": "it_IT", "Title": "Chiave di ripristino non salvata in Entra ID",
+          "Description": "La chiave di ripristino BitLocker deve essere salvata in Entra ID. Il prossimo ciclo di compliance riproverà automaticamente; se persiste, collegarsi alla rete aziendale ed eseguire una sincronizzazione dal Company Portal." }
+      ]
+    }
+  ]
+}
