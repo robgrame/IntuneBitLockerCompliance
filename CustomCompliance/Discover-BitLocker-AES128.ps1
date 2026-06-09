@@ -3,10 +3,10 @@
     Intune Custom Compliance - Discovery script for BitLocker (AES-128 variant)
 
 .DESCRIPTION
-    Variante della policy BitLocker che richiede AES-128 anziché XtsAes256.
-    Identica nella struttura a Discover-BitLocker.ps1, ma il setting
-    valutato per l'algoritmo è BL_IsEncryptionMethodAes128 e accetta sia
-    `Aes128` (CBC, legacy) sia `XtsAes128` (XTS, moderno).
+    Variante della policy BitLocker che accetta come algoritmo di cifratura
+    `Aes128` (AES-CBC 128 legacy) OPPURE `XtsAes256` (XTS-AES 256 moderno).
+    Tutti gli altri 5 controlli (ProtectionOn, FullyEncrypted, EncryptionComplete,
+    TPM protector, RecoveryPassword protector) sono identici alla policy principale.
 
     Output: una sola riga JSON valido (vedi schema in fondo).
     Lo script DEVE essere firmato (signed) per essere caricato in Custom
@@ -18,19 +18,18 @@
     Output schema (flat). Setting evaluated booleans + raw diagnostic fields:
 
         Evaluated booleans (referenced by BitLockerComplianceRules-AES128.json):
-            BL_IsProtectionOn                  : Bool
-            BL_IsVolumeFullyEncrypted          : Bool
-            BL_IsEncryptionComplete            : Bool (>=100%)
-            BL_IsEncryptionMethodAes128        : Bool (Aes128 OR XtsAes128)
-            BL_HasTpmProtector                 : Bool
-            BL_HasRecoveryPasswordProtector    : Bool
-            BL_IsRecoveryKeyEscrowedInEntraId  : Bool
+            BL_IsProtectionOn                       : Bool
+            BL_IsVolumeFullyEncrypted               : Bool
+            BL_IsEncryptionComplete                 : Bool (>=100%)
+            BL_IsEncryptionMethodAes128OrXtsAes256  : Bool (Aes128 OR XtsAes256)
+            BL_HasTpmProtector                      : Bool
+            BL_HasRecoveryPasswordProtector         : Bool
 
         Raw diagnostic fields (NOT evaluated):
             BL_MountPoint, BL_ProtectionStatus, BL_VolumeStatus,
             BL_EncryptionMethod, BL_EncryptionPercentage,
-            BL_KeyProtectorTypes, BL_EntraIdJoined, BL_TpmReady,
-            BL_NonComplianceReasons
+            BL_KeyProtectorTypes, BL_IsRecoveryKeyEscrowedInEntraId (unreliable),
+            BL_EntraIdJoined, BL_TpmReady, BL_NonComplianceReasons
 #>
 
 #region Helpers
@@ -93,7 +92,7 @@ try {
     $escrowed    = Test-RecoveryPasswordEscrowed -RecoveryKeyIds $recoveryIds
 
     $methodStr = "$($vol.EncryptionMethod)"
-    $isAes128  = ($methodStr -eq 'Aes128' -or $methodStr -eq 'XtsAes128')
+    $isAccepted = ($methodStr -eq 'Aes128' -or $methodStr -eq 'XtsAes256')
 
     $reasons = New-Object System.Collections.Generic.List[string]
     if ("$($vol.ProtectionStatus)" -ne 'On') {
@@ -102,8 +101,8 @@ try {
     if ("$($vol.VolumeStatus)" -ne 'FullyEncrypted') {
         $reasons.Add("VolumeStatus is $($vol.VolumeStatus) at $([int]$vol.EncryptionPercentage)%")
     }
-    if (-not $isAes128) {
-        $reasons.Add("EncryptionMethod is $methodStr (expected Aes128 or XtsAes128)")
+    if (-not $isAccepted) {
+        $reasons.Add("EncryptionMethod is $methodStr (expected Aes128 or XtsAes256)")
     }
     if ($protectorTypes -notcontains 'Tpm') {
         $reasons.Add("Missing TPM key protector")
@@ -120,7 +119,7 @@ try {
         BL_IsProtectionOn                  = [bool]("$($vol.ProtectionStatus)" -eq 'On')
         BL_IsVolumeFullyEncrypted          = [bool]("$($vol.VolumeStatus)" -eq 'FullyEncrypted')
         BL_IsEncryptionComplete            = [bool]([int]$vol.EncryptionPercentage -ge 100)
-        BL_IsEncryptionMethodAes128        = [bool]$isAes128
+        BL_IsEncryptionMethodAes128OrXtsAes256 = [bool]$isAccepted
         BL_HasTpmProtector                 = [bool]($protectorTypes -contains 'Tpm')
         BL_HasRecoveryPasswordProtector    = [bool]($protectorTypes -contains 'RecoveryPassword')
 
@@ -149,7 +148,7 @@ catch {
         BL_IsProtectionOn                  = $false
         BL_IsVolumeFullyEncrypted          = $false
         BL_IsEncryptionComplete            = $false
-        BL_IsEncryptionMethodAes128        = $false
+        BL_IsEncryptionMethodAes128OrXtsAes256 = $false
         BL_HasTpmProtector                 = $false
         BL_HasRecoveryPasswordProtector    = $false
         BL_IsRecoveryKeyEscrowedInEntraId  = $false
