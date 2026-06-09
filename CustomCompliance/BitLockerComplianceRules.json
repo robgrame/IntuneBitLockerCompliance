@@ -40,16 +40,16 @@
       ]
     },
     {
-      "SettingName": "BL_IsEncryptionMethodXtsAes256",
+      "SettingName": "BL_IsEncryptionMethodXts",
       "Operator": "IsEquals",
       "DataType": "Boolean",
       "Operand": true,
       "MoreInfoUrl": "https://learn.microsoft.com/windows/security/operating-system-security/data-protection/bitlocker/",
       "RemediationStrings": [
-        { "Language": "en_US", "Title": "Encryption algorithm is not XtsAes256",
-          "Description": "BitLocker must use XtsAes256 on the system drive. Changing algorithm requires decrypting and re-encrypting the drive; contact IT." },
-        { "Language": "it_IT", "Title": "Algoritmo di cifratura non è XtsAes256",
-          "Description": "BitLocker deve usare XtsAes256 sul disco di sistema. Cambiare algoritmo richiede di decifrare e ri-cifrare il disco; contattare IT." }
+        { "Language": "en_US", "Title": "Encryption algorithm is not XTS-AES",
+          "Description": "BitLocker must use XTS-AES (XtsAes128 or XtsAes256) on the system drive. Older AES-CBC algorithms are not accepted. Changing algorithm requires decrypting and re-encrypting the drive; contact IT." },
+        { "Language": "it_IT", "Title": "Algoritmo di cifratura non è XTS-AES",
+          "Description": "BitLocker deve usare XTS-AES (XtsAes128 o XtsAes256) sul disco di sistema. Gli algoritmi AES-CBC legacy non sono accettati. Cambiare algoritmo richiede di decifrare e ri-cifrare il disco; contattare IT." }
       ]
     },
     {

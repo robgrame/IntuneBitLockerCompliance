@@ -16,13 +16,13 @@
 
     Output schema (flat). Keys prefixed BL_*; *evaluated* settings encode the
     expected value in the name (Is*/Has*) so the Intune per-setting report
-    is self-documenting (e.g. "BL_IsEncryptionMethodXtsAes256 = Compliant"):
+    is self-documenting (e.g. "BL_IsEncryptionMethodXts = Compliant"):
 
         Evaluated booleans (referenced by BitLockerComplianceRules.json):
             BL_IsProtectionOn                  : Bool (true = ProtectionStatus == 'On')
             BL_IsVolumeFullyEncrypted          : Bool (true = VolumeStatus  == 'FullyEncrypted')
             BL_IsEncryptionComplete            : Bool (true = EncryptionPercentage >= 100)
-            BL_IsEncryptionMethodXtsAes256     : Bool (true = EncryptionMethod == 'XtsAes256')
+            BL_IsEncryptionMethodXts           : Bool (true = EncryptionMethod in XtsAes128, XtsAes256)
             BL_HasTpmProtector                 : Bool
             BL_HasRecoveryPasswordProtector    : Bool
             BL_IsRecoveryKeyEscrowedInEntraId  : Bool
@@ -122,7 +122,7 @@ try {
         BL_IsProtectionOn                  = [bool]("$($vol.ProtectionStatus)" -eq 'On')
         BL_IsVolumeFullyEncrypted          = [bool]("$($vol.VolumeStatus)" -eq 'FullyEncrypted')
         BL_IsEncryptionComplete            = [bool]([int]$vol.EncryptionPercentage -ge 100)
-        BL_IsEncryptionMethodXtsAes256     = [bool]("$($vol.EncryptionMethod)" -eq 'XtsAes256')
+        BL_IsEncryptionMethodXts           = [bool]("$($vol.EncryptionMethod)" -in @('XtsAes128','XtsAes256'))
         BL_HasTpmProtector                 = [bool]($protectorTypes -contains 'Tpm')
         BL_HasRecoveryPasswordProtector    = [bool]($protectorTypes -contains 'RecoveryPassword')
 
@@ -157,7 +157,7 @@ catch {
         BL_IsProtectionOn                  = $false
         BL_IsVolumeFullyEncrypted          = $false
         BL_IsEncryptionComplete            = $false
-        BL_IsEncryptionMethodXtsAes256     = $false
+        BL_IsEncryptionMethodXts           = $false
         BL_HasTpmProtector                 = $false
         BL_HasRecoveryPasswordProtector    = $false
         BL_IsRecoveryKeyEscrowedInEntraId  = $false

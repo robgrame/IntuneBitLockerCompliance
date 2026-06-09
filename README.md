@@ -155,7 +155,7 @@ aprire le regole. Ogni regola è un semplice `Boolean IsEquals true`.
 | BL_IsProtectionOn | `ProtectionStatus == 'On'` |
 | BL_IsVolumeFullyEncrypted | `VolumeStatus == 'FullyEncrypted'` |
 | BL_IsEncryptionComplete | `EncryptionPercentage >= 100` |
-| BL_IsEncryptionMethodXtsAes256 | `EncryptionMethod == 'XtsAes256'` |
+| BL_IsEncryptionMethodXts | `EncryptionMethod ∈ { XtsAes128, XtsAes256 }` |
 | BL_HasTpmProtector | TPM key protector presente |
 | BL_HasRecoveryPasswordProtector | RecoveryPassword key protector presente |
 
