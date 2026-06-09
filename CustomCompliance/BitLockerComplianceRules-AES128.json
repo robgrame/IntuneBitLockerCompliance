@@ -77,19 +77,6 @@
         { "Language": "it_IT", "Title": "Chiave di ripristino mancante",
           "Description": "È richiesto un protettore RecoveryPassword di BitLocker. Contattare IT per aggiungerlo." }
       ]
-    },
-    {
-      "SettingName": "BL_IsRecoveryKeyEscrowedInEntraId",
-      "Operator": "IsEquals",
-      "DataType": "Boolean",
-      "Operand": true,
-      "MoreInfoUrl": "https://learn.microsoft.com/mem/intune/protect/encrypt-devices",
-      "RemediationStrings": [
-        { "Language": "en_US", "Title": "Recovery key not backed up to Entra ID",
-          "Description": "The BitLocker recovery key must be escrowed to Entra ID (Azure AD). The next compliance run will retry automatically; if it persists, sign in to a corporate network and run a sync from Company Portal." },
-        { "Language": "it_IT", "Title": "Chiave di ripristino non salvata in Entra ID",
-          "Description": "La chiave di ripristino BitLocker deve essere salvata in Entra ID. Il prossimo ciclo di compliance riproverà automaticamente; se persiste, collegarsi alla rete aziendale ed eseguire una sincronizzazione dal Company Portal." }
-      ]
     }
   ]
 }

@@ -123,6 +123,10 @@ try {
         BL_IsEncryptionMethodAes128        = [bool]$isAes128
         BL_HasTpmProtector                 = [bool]($protectorTypes -contains 'Tpm')
         BL_HasRecoveryPasswordProtector    = [bool]($protectorTypes -contains 'RecoveryPassword')
+
+        # NOTE: BL_IsRecoveryKeyEscrowedInEntraId is emitted for diagnostic
+        # purposes only and NOT referenced by BitLockerComplianceRules-AES128.json
+        # (EventID-845 lookup is unreliable). Use Entra ID portal as source of truth.
         BL_IsRecoveryKeyEscrowedInEntraId  = [bool]$escrowed
 
         # ---- Raw diagnostic fields (NOT evaluated by rules; carried for debugging) ----

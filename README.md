@@ -158,7 +158,14 @@ aprire le regole. Ogni regola è un semplice `Boolean IsEquals true`.
 | BL_IsEncryptionMethodXtsAes256 | `EncryptionMethod == 'XtsAes256'` |
 | BL_HasTpmProtector | TPM key protector presente |
 | BL_HasRecoveryPasswordProtector | RecoveryPassword key protector presente |
-| BL_IsRecoveryKeyEscrowedInEntraId | Recovery key salvata in Entra ID (EventID 845) |
+
+> ⚠️ **`BL_IsRecoveryKeyEscrowedInEntraId` NON è più una regola valutata**:
+> il check via EventID 845 del log `Microsoft-Windows-BitLocker/BitLocker
+> Management` si è dimostrato inaffidabile (log vuoti/ruotati, escrow
+> avvenuto prima dell'abilitazione del logging, SYSTEM che non vede tutte
+> le entry). Il campo viene comunque emesso come dato raw per debug. Per
+> verificare l'escrow effettivo usa il portale Entra ID come fonte di
+> verità.
 
 ### Campi raw diagnostici (NON valutati dalle regole)
 

@@ -125,6 +125,14 @@ try {
         BL_IsEncryptionMethodXtsAes256     = [bool]("$($vol.EncryptionMethod)" -eq 'XtsAes256')
         BL_HasTpmProtector                 = [bool]($protectorTypes -contains 'Tpm')
         BL_HasRecoveryPasswordProtector    = [bool]($protectorTypes -contains 'RecoveryPassword')
+
+        # NOTE: BL_IsRecoveryKeyEscrowedInEntraId is emitted for diagnostic
+        # purposes but is NOT referenced by BitLockerComplianceRules.json:
+        # the EventID-845 check in Microsoft-Windows-BitLocker/BitLocker
+        # Management is unreliable (log may be empty/rotated, escrow may
+        # have happened before logging was enabled, SYSTEM may not see all
+        # entries). Use the Entra ID admin portal as source of truth for
+        # recovery key escrow.
         BL_IsRecoveryKeyEscrowedInEntraId  = [bool]$escrowed
 
         # ---- Raw diagnostic fields (NOT evaluated by rules; carried for debugging) ----
